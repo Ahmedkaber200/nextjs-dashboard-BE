@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\CustomerController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +17,8 @@ Route::post('/login',[AuthController::class,'login']);
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('logout',[AuthController::class,'logout']);
     Route::apiResource('products', ProductController::class);
+    Route::apiResource('customers', CustomerController::class);
+    Route::get('getprofile', [UserController::class, 'getProfile']);
 });
 
 // Route::post('logout',[AuthController::class,'logout'])->middleware('auth:sanctum');

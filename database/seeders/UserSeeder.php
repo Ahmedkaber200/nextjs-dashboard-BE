@@ -21,7 +21,5 @@ class UserSeeder extends Seeder
 			'email' => 'admin@example.com',
 			'password' => Hash::make('let123456')
 		]);
-
-
     }
 }
