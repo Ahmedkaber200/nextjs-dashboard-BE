@@ -15,8 +15,7 @@ class ProductController extends BaseController
      */
     public function index()
     {
-        $data['products'] = Product::all();
-
+        $data = Product::all();
         return $this->sendResponse($data, 'All Product Data.');
 
         // return response()->json([
@@ -64,12 +63,12 @@ class ProductController extends BaseController
      */
     public function show(string $id)
     {
-        $data['product'] = Product::select(
+        $data = Product::select(
             'id',
             'name',
             'description',
             'price'
-        )->where(['id' => $id])->get();
+        )->where(['id' => $id])->first();
 
         return $this->sendResponse($data, 'My Single Product Fetch.');
         
