@@ -22,6 +22,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->decimal('total_amount');
             $table->date('date');
+            //  $table->enum('status', ['pending', 'paid']);
             $table->string('status')->nullable()->default('pending');
             $table->json('product_details')->nullable();
             

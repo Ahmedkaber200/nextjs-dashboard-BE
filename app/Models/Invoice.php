@@ -11,6 +11,10 @@ class Invoice extends Model
         'customer_id', 'total_amount', 'date', 'status', 'product_details'
     ];
 
+     protected $casts = [
+        'product_details' => 'array', // array of strings
+    ];
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
