@@ -16,7 +16,7 @@ class CustomerController extends BaseController
     public function index()
     {
         return response()->json([
-            'data' => Customer::select('id', 'name')->get()
+            'data' => Customer::select('id', 'name', 'email', 'contact', 'address')->get()
         ]);
         // $data = Customer::all();
         // return $this->sendResponse($data, 'All Customer Data.');

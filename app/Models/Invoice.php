@@ -11,13 +11,6 @@ class Invoice extends Model
         'customer_id', 'total_amount', 'date', 'status', 'product_details'
     ];
 
-    //  protected function casts(): array
-    // {
-    //     return [
-    //           'options' => 'json:unicode',
-    //     ];
-    // }
-
      protected $casts = [
         'product_details' => 'array', // array of strings
     ];

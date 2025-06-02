@@ -19,10 +19,10 @@ class InvoiceController extends Controller
     public function index()
 {
     $invoices = Invoice::with('customer')->get();
-    return $invoices->map(function ($invoice) {
+    $invoices =  $invoices->map(function ($invoice) {
         return [
             'id'             => $invoice->id,
-            // 'customer_id'    => $invoice->customer_id,
+            'customer_id'    => $invoice->customer_id,
             'customer'       => $invoice->customer,
             'total_amount'   => $invoice->total_amount,
             'status'         => $invoice->status,
@@ -32,6 +32,9 @@ class InvoiceController extends Controller
             // 'updated_at'     => $invoice->updated_at,
         ];
     });
+    return response()->json([
+            'data' => $invoices
+        ]);
 }
 
     /**
