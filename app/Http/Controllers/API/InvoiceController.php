@@ -28,8 +28,6 @@ class InvoiceController extends Controller
             'status'         => $invoice->status,
             'date'           => $invoice->date,
             'products'       =>  $invoice->product_details,
-            // 'created_at'     => $invoice->created_at,
-            // 'updated_at'     => $invoice->updated_at,
         ];
     });
     return response()->json([
@@ -62,8 +60,6 @@ public function store(Request $request)
             'total_amount'    => $request->total_amount,
             'date'            => $request->date ?? Carbon::now()->toDateString(),
             'status'          => $request->status,
-            // $invoice->product_details = json_decode($invoice->product_details); // ✅ decode for response
-            // 'product_details' => $request->product_details,
             'product_details' => $request->product_details, // ✅ Store as array
         ]);
 
@@ -95,24 +91,85 @@ public function store(Request $request)
     /**
      * Display the specified resource.
      */
+
     public function show(string $id)
-    {
-        //
-    }
+{
+    $invoice = Invoice::with(['customer'])->findOrFail($id);
+
+    $data = [
+        'id' => $invoice->id,
+        'customer_id' => $invoice->customer_id,
+        'customer' => [
+            'id' => $invoice->customer->id,
+            'name' => $invoice->customer->name,
+        ],
+        'status' => $invoice->status,
+        'product_details' => $invoice->product_details, // assuming it's JSON
+        'date' => $invoice->date,
+        'total_amount' => $invoice->total_amount,
+    ];
+
+    return $this->sendResponse($data, 'Invoice fetched successfully.');
+}
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+
+ public function update(Request $request, string $id)
+{
+    $validateInvoice = Validator::make(
+        $request->all(),
+        [
+        'customer_id'      => 'required|exists:customers,id',
+        'status'           => 'required|string',
+        'date'             => 'nullable|date',
+        'product_details'  => 'required',
+        ]
+    );
+
+    if ($validateInvoice->fails()) {
+        return $this->sendError('Validation Error', $validateInvoice->errors()->all());
     }
+
+    $invoice = Invoice::where('id', $id)->first();
+
+    if (!$invoice) {
+        return $this->sendError('Invoice not found.');
+    }
+
+    // Calculate total amount
+    $totalAmount = collect($request->product_details)
+    ->sum(function ($product) {
+        return $product['price'];
+    });
+
+    $invoice->update([
+            'customer_id'     => $request->customer_id,
+            'date'            => $request->date ?? Carbon::now()->toDateString(),
+            'status'          => $request->status,
+            'product_details' => $request->product_details, // ✅ Store as array
+            'total_amount'    => $totalAmount, // ✅ Add this
+    ]);
+
+    // $invoice->products()->sync($productDetails);
+    return $this->sendResponse($invoice, 'Invoice fetched successfully.');
+
+    // return $this->sendResponse($invoice->load('products'), 'Invoice updated successfully.');
+}
+
+//     public function update(Request $request, string $id)
+//    {
+       
+//     }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        //
+        $invoice = Invoice::where('id' ,$id)->delete();
+        return $this->sendResponse($invoice, 'My Customer data has been removed.');
     }
 }
