@@ -126,6 +126,7 @@ public function store(Request $request)
         'status'           => 'required|string',
         'date'             => 'nullable|date',
         'product_details'  => 'required',
+        'total_amount'     => 'required',
         ]
     );
 
