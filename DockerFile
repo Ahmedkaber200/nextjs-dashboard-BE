@@ -1,0 +1,43 @@
+# Laravel کے لیے بنیادی PHP image
+FROM php:8.2-fpm
+
+# ضروری پیکجز انسٹال کریں
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    curl \
+    git \
+    libzip-dev \
+    nano \
+    mysql-client \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd
+
+# Composer انسٹال کریں
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+
+# ورکنگ ڈائریکٹری بنائیں
+WORKDIR /var/www
+
+# موجودہ Laravel پروجیکٹ کی تمام فائلیں کاپی کریں
+COPY . .
+
+# Laravel dependencies انسٹال کریں
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Laravel کی permission سیٹ کریں
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage
+
+# Laravel کی app key generate کریں (اگر env میں APP_KEY نہیں ہے تو بعد میں generate کریں)
+# CMD میں "php artisan key:generate" شامل کیا جا سکتا ہے
+
+EXPOSE 8000
+
+# Laravel کا server چلائیں
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
