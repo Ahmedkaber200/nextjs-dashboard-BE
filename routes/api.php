@@ -20,9 +20,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('products', ProductController::class);
     Route::apiResource('customers', CustomerController::class);
     Route::get('getprofile', [UserController::class, 'getProfile']);
-
     Route::apiResource('invoices', InvoiceController::class);
-
 });
 
 // Route::post('logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
