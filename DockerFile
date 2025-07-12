@@ -1,21 +1,42 @@
-FROM php:8.2-cli
 
+# Use the official PHP 8.2 FPM image
+FROM php:8.2-fpm
+
+# Install system dependencies and PHP extensions
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    curl \
+    git \
+    libzip-dev \
+    nano \
+    mysql-client \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd
+
+# Install Composer
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+
+# Set working directory
 WORKDIR /var/www
 
-RUN apt-get update && apt-get install -y \
-    zip unzip git curl libpng-dev libonig-dev libxml2-dev libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl zip
-
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
+# Copy project files
 COPY . .
-# //
-RUN composer install --no-dev --optimize-autoloader
-RUN chmod -R 755 /var/www/storage /var/www/bootstrap/cache
 
+# Install PHP dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage
+
+# Expose port 8000
 EXPOSE 8000
 
+# Start Laravel server
 CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
-
-
-
